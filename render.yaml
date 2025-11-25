@@ -4,10 +4,13 @@ services:
     env: python
     buildCommand: "./build.sh"
     startCommand: "gunicorn expense_tracker_core.wsgi:application"
+    plan: free
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0
       - key: SECRET_KEY
         generateValue: true
+      - key: DEBUG
+        value: "False"
       - key: WEB_CONCURRENCY
         value: 4
