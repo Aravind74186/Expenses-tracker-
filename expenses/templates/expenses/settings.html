@@ -1,0 +1,22 @@
+{% extends 'expenses/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-top: 0; margin-bottom: 1.5rem;">Settings</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin-bottom: 1.5rem;">
+            <label for="{{ form.currency_code.id_for_label }}">Select Currency</label>
+            {{ form.currency_code }}
+            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.5rem;">
+                This will update the currency symbol across the entire application.
+            </p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">Save Settings</button>
+            <a href="{% url 'expense_list' %}" class="btn"
+                style="background: var(--card-bg); color: var(--text-secondary); flex: 1; text-align: center;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

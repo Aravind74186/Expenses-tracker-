@@ -1,0 +1,61 @@
+{% extends 'expenses/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-top: 0; margin-bottom: 1.5rem;">Monthly Budgets ({{ current_month|date:"F Y" }})</h2>
+
+    <div style="display: grid; gap: 1.5rem;">
+        {% for item in budget_data %}
+        <div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 600;">{{ item.category }}</span>
+                <span style="color: var(--text-secondary);">
+                    <span class="amount"
+                        style="color: {% if item.is_over %}var(--danger){% else %}var(--text-primary){% endif %}">
+                        {{ currency }}{{ item.spent|floatformat:2 }}
+                    </span>
+                    / {{ currency }}{{ item.limit|floatformat:2 }}
+                </span>
+            </div>
+            <div style="background-color: var(--bg-color); height: 8px; border-radius: 4px; overflow: hidden;">
+                <div style="
+                    width: {{ item.percent }}%; 
+                    height: 100%; 
+                    background-color: {% if item.is_over %}var(--danger){% else %}var(--success){% endif %};
+                    transition: width 0.5s ease-in-out;
+                "></div>
+            </div>
+        </div>
+        {% empty %}
+        <p style="color: var(--text-secondary); text-align: center;">No budgets set for this month.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="margin-top: 0; margin-bottom: 1.5rem;">Set Budget</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <div>
+                <label for="{{ form.category.id_for_label }}">Category</label>
+                {{ form.category }}
+            </div>
+            <div>
+                <label for="{{ form.amount.id_for_label }}">Limit</label>
+                {{ form.amount }}
+            </div>
+            <div>
+                <label for="{{ form.month.id_for_label }}">Month</label>
+                {{ form.month }}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Set Budget</button>
+    </form>
+</div>
+
+<div style="text-align: center; margin-top: 2rem;">
+    <a href="{% url 'expense_list' %}" class="btn" style="background: var(--card-bg); color: var(--text-secondary);">←
+        Back to Dashboard</a>
+</div>
+{% endblock %}

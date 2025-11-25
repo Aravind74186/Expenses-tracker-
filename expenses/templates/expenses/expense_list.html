@@ -1,0 +1,234 @@
+{% extends 'expenses/base.html' %}
+
+{% block content %}
+<div
+    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="card"
+        style="margin-bottom: 0; background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(30, 58, 138, 0.3));">
+        <div style="color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Total
+            Expenses</div>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);">{{ currency }}{{
+            total_expenses|floatformat:2 }}
+        </div>
+    </div>
+    <div class="card" style="margin-bottom: 0;">
+        <div style="color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">
+            Transactions</div>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);">{{ expenses.count }}</div>
+    </div>
+    <div class="card" style="margin-bottom: 0;">
+        <div style="color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Active
+            Categories</div>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);">{{ category_data|length }}</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+    <div class="card" style="margin-bottom: 0;">
+        <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Spending Trend</h2>
+        <div style="height: 300px;">
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
+    <div class="card" style="margin-bottom: 0;">
+        <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">By Category</h2>
+        <div style="height: 300px; position: relative;">
+            <canvas id="expensesChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.25rem; margin: 0;">Recent Transactions</h2>
+        <div style="display: flex; gap: 0.5rem;">
+            <a href="{% url 'export_expenses' %}?{{ request.GET.urlencode }}" class="btn"
+                style="background: var(--card-bg); color: var(--text-secondary); padding: 0.5rem 1rem; font-size: 0.875rem;">
+                Export CSV
+            </a>
+        </div>
+    </div>
+
+    <form method="get"
+        style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 2rem; background: rgba(15, 23, 42, 0.3); padding: 1rem; border-radius: 1rem;">
+        <div style="flex: 1;">
+            <label for="start_date">From Date</label>
+            <input type="date" name="start_date" id="start_date" value="{{ request.GET.start_date }}"
+                style="margin-bottom: 0;">
+        </div>
+        <div style="flex: 1;">
+            <label for="end_date">To Date</label>
+            <input type="date" name="end_date" id="end_date" value="{{ request.GET.end_date }}"
+                style="margin-bottom: 0;">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-bottom: 0;">Filter</button>
+        {% if request.GET.start_date or request.GET.end_date %}
+        <a href="{% url 'expense_list' %}" class="btn"
+            style="background: var(--border); color: var(--text-primary); margin-bottom: 0;">Clear</a>
+        {% endif %}
+    </form>
+
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td style="white-space: nowrap; color: var(--text-secondary);">{{ expense.date }}</td>
+                    <td style="font-weight: 500;">{{ expense.description }}</td>
+                    <td><span class="badge">{{ expense.category }}</span></td>
+                    <td class="amount">{{ currency }}{{ expense.amount }}</td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <a href="{% url 'edit_expense' expense.pk %}" class="btn"
+                            style="background: transparent; color: var(--accent); padding: 0.5rem; margin-right: 0.25rem;">
+                            ✎
+                        </a>
+                        <form method="post" action="{% url 'delete_expense' expense.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')"
+                                style="padding: 0.5rem;">
+                                ✕
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                        No expenses found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Add New Expense</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div>
+                <label for="{{ form.description.id_for_label }}">Description</label>
+                {{ form.description }}
+            </div>
+            <div>
+                <label for="{{ form.amount.id_for_label }}">Amount</label>
+                {{ form.amount }}
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div>
+                <label for="{{ form.category.id_for_label }}">Category</label>
+                {{ form.category }}
+            </div>
+            <div>
+                <label for="{{ form.date.id_for_label }}">Date</label>
+                {{ form.date }}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Add Expense</button>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Common Chart Options
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Outfit', sans-serif";
+
+        // Doughnut Chart
+        const ctx = document.getElementById('expensesChart').getContext('2d');
+        const categoryData = {{ category_data| safe
+    }};
+
+    const labels = categoryData.map(item => item.category__name);
+    const data = categoryData.map(item => item.total);
+
+    const colors = [
+        '#38bdf8', '#818cf8', '#34d399', '#f472b6', '#fbbf24', '#a78bfa',
+        '#f87171', '#60a5fa', '#c084fc', '#4ade80'
+    ];
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors,
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 20, usePointStyle: true }
+                }
+            },
+            cutout: '75%'
+        }
+    });
+
+    // Trend Chart
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    const dailyData = {{ daily_data| safe }};
+
+    const trendLabels = dailyData.map(item => item.date);
+    const trendValues = dailyData.map(item => item.daily_total);
+
+    // Create gradient
+    const gradient = trendCtx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
+    gradient.addColorStop(1, 'rgba(56, 189, 248, 0)');
+
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: trendLabels,
+            datasets: [{
+                label: 'Daily Spending',
+                data: trendValues,
+                borderColor: '#38bdf8',
+                backgroundColor: gradient,
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+    });
+</script>
+{% endblock %}

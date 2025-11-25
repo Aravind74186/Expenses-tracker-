@@ -1,0 +1,35 @@
+{% extends 'expenses/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-top: 0; margin-bottom: 1.5rem;">Edit Expense</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+                <label for="{{ form.description.id_for_label }}">Description</label>
+                {{ form.description }}
+            </div>
+            <div>
+                <label for="{{ form.amount.id_for_label }}">Amount</label>
+                {{ form.amount }}
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+                <label for="{{ form.category.id_for_label }}">Category</label>
+                {{ form.category }}
+            </div>
+            <div>
+                <label for="{{ form.date.id_for_label }}">Date</label>
+                {{ form.date }}
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+            <a href="{% url 'expense_list' %}" class="btn"
+                style="background: var(--border); color: var(--text-primary); flex: 1; text-align: center;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
