@@ -4,11 +4,9 @@ A premium, modern expense tracking application built with Django. Features a gla
 
 ## 🚀 Live Demo
 
-[**View Live Demo**](https://your-demo-url.com)
-
 ![Dashboard Preview](dashboard_preview.png)
 
-*(Replace this link with your deployed application URL)*
+
 
 ### Deploy your own:
 
