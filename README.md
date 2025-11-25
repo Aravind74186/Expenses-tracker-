@@ -1,17 +1,6 @@
-# Expense Tracker V2
+# Expense Tracker 
 
 A premium, modern expense tracking application built with Django. Features a glassmorphism design, interactive charts, and comprehensive budget management.
-
-## 🚀 Live Demo
-
-![Dashboard Preview](dashboard_preview.png)
-
-
-
-### Deploy your own:
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Aravind74186/Expenses-tracker-)
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new)
 
 ## ✨ Features
 
