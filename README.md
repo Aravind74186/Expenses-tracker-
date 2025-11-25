@@ -10,7 +10,7 @@ A premium, modern expense tracking application built with Django. Features a gla
 
 ### Deploy your own:
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Aravind74186/Expenses-tracker-)
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new)
 
 ## ✨ Features
